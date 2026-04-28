@@ -9,13 +9,13 @@
 
 ---
 
-## 🎯 Descripción del Problema
+## Descripción del Problema
 
 El proceso de formatear referencias bibliográficas es una de las tareas más tediosas y propensas a errores para estudiantes y académicos. Las herramientas actuales suelen tener interfaces anticuadas, requieren cuentas de pago o no aplican correctamente las sutilezas de la norma APA (como la sangría francesa o el uso condicional de fechas de recuperación).
 
 **CitaElSitio** resuelve este problema ofreciendo una experiencia sin fricciones: el usuario ingresa una URL, el sistema extrae automáticamente la información del portal y el motor lógico ensambla la cita perfecta. Al finalizar, permite exportar toda la lista de referencias directamente a `.docx` o `.pdf` lista para entregar.
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 El proyecto fue desarrollado como una SPA (Single Page Application) sin backend (Serverless), priorizando la velocidad y el diseño responsivo:
 
@@ -25,7 +25,7 @@ El proyecto fue desarrollado como una SPA (Single Page Application) sin backend 
 * **Persistencia:** API de `LocalStorage` (Cero costos de base de datos).
 * **Generación de Archivos:** `jsPDF` (para documentos PDF) y `docx` (para exportación nativa a MS Word con estilos APA).
 
-## 🧠 Hito Técnico Principal
+## Hito Técnico Principal
 
 El mayor desafío técnico fue construir el **Motor Lógico APA (`apaEngine.js`)** y acoplarlo a la exportación nativa de Word. 
 
@@ -33,13 +33,13 @@ No se trataba solo de concatenar textos. Se implementó una lógica de segmentac
 
 > 📸 *[ESPACIO PARA CAPTURA DE PANTALLA: Inserta aquí una imagen de CitaElSitio funcionando en escritorio (Bento Grid) y otra al lado mostrando cómo se apila perfectamente en versión móvil]*
 
-## 💼 Perfil Híbrido: Código con Visión de Negocio
+## Perfil Híbrido: Código con Visión de Negocio
 
 Mi background previo en **[TU CARRERA ANTERIOR, ej: Administración / RRHH / Gestión de Proyectos]** combinado con mi actual formación como Tecnóloga en Análisis y Desarrollo de Software me ha dado una visión sumamente pragmática del desarrollo: **el código debe resolver problemas reales, ser eficiente y no generar gastos innecesarios.**
 
 Este proyecto refleja esa mentalidad. En lugar de construir un backend costoso para hacer *scraping*, integré una API gratuita de alto rendimiento. En lugar de forzar a los usuarios a registrarse, utilicé almacenamiento local para retener su historial de forma segura. Esta capacidad para diseñar soluciones arquitectónicas que balancean la viabilidad técnica con la excelente experiencia de usuario (UX) es el valor principal que aporto a cualquier equipo de desarrollo.
 
-## 📊 Funcionalidades Clave
+## Funcionalidades Clave
 
 * **Autocompletado Inteligente:** Extracción asíncrona de título, autor y año desde cualquier URL.
 * **Paginación Integrada:** Manejo de estado en React para navegar por bibliografías extensas sin romper la interfaz.
