@@ -1,4 +1,4 @@
-# 📚 CitaElSitio - Generador Inteligente de Citas APA (7ma Edición)
+# CitaElSitio - Generador Inteligente de Citas APA (7ma Edición)
 
 [![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org/)
 [![TailwindCSS](https://img.shields.io/badge/UI-Tailwind_CSS-38B2AC.svg)](https://tailwindcss.com/)
