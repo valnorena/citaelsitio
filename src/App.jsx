@@ -11,8 +11,9 @@ function App() {
   const [siteType, setSiteType] = useState(null);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
-  const [citationData, setCitationData] = useState({ author: '', year: '', title: '', siteName: '', isDynamic: false });
-  const [finalCitation, setFinalCitation] = useState([]); // Cambiado a array
+  // NUEVO: Añadimos isExtracted al estado inicial
+  const [citationData, setCitationData] = useState({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
+  const [finalCitation, setFinalCitation] = useState([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,17 +57,20 @@ function App() {
           yearExtracted = new Date(extracted.date).getFullYear().toString();
         }
 
+        // NUEVO: Le decimos al estado que SÍ fue extraído por la API
         setCitationData({
           author: extracted.author || '',
           year: yearExtracted,
           title: extracted.title || '',
           siteName: extracted.publisher || '',
-          isDynamic: false
+          isDynamic: false,
+          isExtracted: true
         });
       }
     } catch (error) {
       console.error("Error al extraer datos:", error);
-      setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false });
+      // NUEVO: Si hay error, isExtracted es false
+      setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
     } finally {
       setIsLoading(false);
 
@@ -87,9 +91,7 @@ function App() {
 
   const handleCreateCitation = () => {
     const dataToProcess = { ...citationData, url };
-    // Ahora devuelve segmentos
     const formattedSegments = formatAPA(siteType, dataToProcess);
-    // Creamos un string plano para el PDF y búsquedas
     const rawTextString = formattedSegments.map(s => s.text).join('');
 
     setFinalCitation(formattedSegments);
@@ -104,7 +106,8 @@ function App() {
 
     setCitations([newCitation, ...citations]);
     setSiteType(null);
-    setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false });
+    // NUEVO: Limpiamos la bandera al terminar
+    setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
     setUrl('');
   };
 
@@ -163,12 +166,6 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-3 w-full lg:w-auto justify-end">
-            {/* <span className="hidden sm:inline-block text-[10px] font-bold tracking-widest text-serenity-600 dark:text-serenity-300 border border-serenity-200 dark:border-serenity-700 px-2 py-0.5 rounded">APA 7TH</span>
-            <span className="text-[10px] font-medium tracking-widest text-slate-400">INVITADO</span>
-            <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
-              Iniciar Sesión
-            </button>
-            */}
             <a
               href="https://github.com/valnorena"
               target="_blank"
@@ -217,11 +214,16 @@ function App() {
 
             {needsConfirmation && (
               <div className="mb-4 p-4 border border-orange-200 dark:border-orange-900/50 bg-orange-50/80 dark:bg-orange-900/20 rounded-xl shrink-0">
-                <p className="text-xs font-bold text-orange-800 dark:text-orange-300 mb-3">No logramos identificar el sitio. Confirma el tipo:</p>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <button onClick={() => confirmType('webpage')} className="flex-1 min-w-[100px] text-center px-3 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Página Web</button>
-                  <button onClick={() => confirmType('academic')} className="flex-1 min-w-[100px] text-center px-3 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Artículo / PDF</button>
-                  <button onClick={() => confirmType('news')} className="flex-1 min-w-[100px] text-center px-3 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Noticia</button>
+                <p className="text-xs font-bold text-orange-800 dark:text-orange-300 mb-3">No logramos identificar la fuente exacta. Por favor, selecciona el tipo:</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <button onClick={() => confirmType('webpage')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Pág. Web</button>
+                  <button onClick={() => confirmType('academic')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Artículo</button>
+                  <button onClick={() => confirmType('news')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Noticia</button>
+                  <button onClick={() => confirmType('book')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Libro</button>
+                  <button onClick={() => confirmType('social')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Social</button>
+                  <button onClick={() => confirmType('video')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Video</button>
+                  <button onClick={() => confirmType('dictionary')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">Diccionario</button>
+                  <button onClick={() => confirmType('chatgpt')} className="px-2 py-2 bg-white dark:bg-slate-800 border border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300 rounded-lg shadow-sm hover:bg-orange-100 dark:hover:bg-orange-900 transition-colors">ChatGPT</button>
                 </div>
               </div>
             )}
@@ -231,7 +233,8 @@ function App() {
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2 flex-wrap">
                     Revisar y Editar Datos ({siteType})
-                    {citationData.title && (
+                    {/* NUEVO: Ahora solo brilla si la API realmente lo extrajo */}
+                    {citationData.isExtracted && (
                       <span className="bg-green-100 text-green-700 text-[9px] px-2 py-0.5 rounded-full border border-green-200 tracking-normal hidden sm:inline-block">
                         Datos extraídos
                       </span>
@@ -257,7 +260,7 @@ function App() {
                   </label>
                 </div>
                 <button onClick={handleCreateCitation} className="w-full bg-serenity-600 hover:bg-serenity-700 dark:bg-serenity-500 dark:hover:bg-serenity-600 text-white text-xs font-bold py-3 rounded-lg transition-colors shadow-sm">
-                  Guardar en Bibliografía
+                  Guardar en Referencias
                 </button>
               </div>
             )}
@@ -276,11 +279,11 @@ function App() {
             </div>
           </div>
 
-          {/* 2. BIBLIOGRAFIA */}
+          {/* 2. REFERENCIAS */}
           <div className="order-3 lg:order-none lg:row-span-2 bg-white/50 dark:bg-slate-800/40 backdrop-blur-md border border-white/50 dark:border-slate-700/40 rounded-2xl p-4 lg:p-5 flex flex-col min-h-[400px] lg:min-h-0 shadow-sm lg:shadow-none">
             <div className="flex justify-between items-center mb-5 shrink-0">
               <h2 className="text-[10px] font-bold text-serenity-400 dark:text-serenity-300/60 tracking-[0.2em] uppercase">
-                Bibliografia
+                Referencias
               </h2>
               <span className="text-[10px] font-bold text-serenity-400 bg-serenity-50/60 dark:bg-slate-700/60 px-2 py-0.5 rounded">
                 {citations.length} ENTRADAS
@@ -291,7 +294,7 @@ function App() {
               {citations.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-serenity-200 dark:text-slate-600">
                   <svg className="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                  <span className="text-[10px] font-bold tracking-widest uppercase">Biblioteca Vacía</span>
+                  <span className="text-[10px] font-bold tracking-widest uppercase">Lista Vacía</span>
                 </div>
               ) : (
                 currentCitations.map(cit => (
@@ -302,7 +305,6 @@ function App() {
                       ? 'bg-serenity-100 dark:bg-slate-700 border-serenity-400 dark:border-serenity-500 shadow-sm'
                       : 'bg-white dark:bg-slate-800 border-serenity-100 dark:border-slate-600 hover:border-serenity-300 dark:hover:border-slate-500'}`}
                   >
-                    {/* RENDERIZA LISTA CON CURSIVAS */}
                     <p className="text-slate-700 dark:text-slate-200 line-clamp-4 leading-relaxed">
                       {Array.isArray(cit.formatted)
                         ? cit.formatted.map((seg, i) => <span key={i} className={seg.italic ? 'italic' : ''}>{seg.text}</span>)
@@ -355,10 +357,10 @@ function App() {
             </div>
           </div>
 
-          {/* 3. GUIA APA AMPLIADA */}
+          {/* 3. GUIA APA */}
           <div className="order-4 lg:order-none bg-white/50 lg:bg-transparent dark:bg-slate-800/40 lg:dark:bg-transparent backdrop-blur-md lg:backdrop-blur-none border border-white/50 lg:border-none dark:border-slate-700/40 rounded-2xl p-4 lg:p-5 flex flex-col overflow-y-visible lg:overflow-y-auto shadow-sm lg:shadow-none">
             <h2 className="text-[10px] font-bold text-serenity-400 dark:text-serenity-300/60 tracking-[0.2em] uppercase mb-4 shrink-0">
-              Guía APA 7ma Edición
+              Guía APA
             </h2>
 
             <div className="flex flex-col gap-3">
@@ -370,25 +372,34 @@ function App() {
               <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-2 mt-1 px-1">
                 <li className="flex gap-2">
                   <span className="font-black text-serenity-500">1.</span>
-                  <p><strong className="text-slate-800 dark:text-slate-100">Autor:</strong> Apellido, Inicial.</p>
+                  <p><strong className="text-slate-800 dark:text-slate-100">Autor:</strong> Apellido, Inicial. (O el nombre de la organización corporativa).</p>
                 </li>
                 <li className="flex gap-2">
                   <span className="font-black text-serenity-500">2.</span>
-                  <p><strong className="text-slate-800 dark:text-slate-100">Fecha:</strong> (Año, 00 de mes) o (s.f.).</p>
+                  <p><strong className="text-slate-800 dark:text-slate-100">Fecha:</strong> (Año, 00 de mes) o la abreviatura (s.f.) si no hay fecha visible.</p>
                 </li>
                 <li className="flex gap-2">
                   <span className="font-black text-serenity-500">3.</span>
-                  <p><strong className="text-slate-800 dark:text-slate-100">Título:</strong> Exacto de la obra.</p>
+                  <p><strong className="text-slate-800 dark:text-slate-100">Título:</strong> Nombre exacto de la obra. (Usa cursiva si es un sitio web o libro).</p>
                 </li>
                 <li className="flex gap-2">
                   <span className="font-black text-serenity-500">4.</span>
-                  <p><strong className="text-slate-800 dark:text-slate-100">Fuente:</strong> Medio y URL directo.</p>
+                  <p><strong className="text-slate-800 dark:text-slate-100">Fuente:</strong> Medio, Editorial y URL directo. (Omitir si el autor es la misma fuente).</p>
                 </li>
               </ul>
 
-              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 rounded-lg mt-2 lg:mt-auto shrink-0">
+              {/* Callout Informativo Actualizado */}
+              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800/50 rounded-lg mt-2 lg:mt-auto shrink-0 flex flex-col gap-2">
                 <p className="text-[10px] text-orange-800 dark:text-orange-300 leading-relaxed">
-                  <strong className="uppercase tracking-wider block mb-1">Cursiva:</strong> Títulos de páginas web o nombres de revistas/periódicos.
+                  <strong className="uppercase tracking-wider block mb-0.5">Uso de Cursivas:</strong>
+                  En APA, la cursiva indica la <em>obra principal</em>. En libros, páginas web o videos, va en el título. En artículos o noticias, va en el nombre de la revista/periódico.
+                </p>
+
+                <div className="h-px w-full bg-orange-200/50 dark:bg-orange-800/50 my-0.5"></div>
+
+                <p className="text-[10px] text-orange-800 dark:text-orange-300 leading-relaxed">
+                  <strong className="uppercase tracking-wider block mb-0.5">Aviso de Extracción:</strong>
+                  Si un sitio web cuenta con protección anti-bots o carece de etiquetas SEO (Metadatos), los campos quedarán en blanco. Deberás completarlos manualmente usando los 4 pilares superiores.
                 </p>
               </div>
             </div>
@@ -437,7 +448,7 @@ function App() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-serenity-200 dark:text-slate-600">
                 <svg className="w-7 h-7 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <span className="text-xs font-medium text-center px-4">Selecciona una cita de la bibliografía para editar sus datos.</span>
+                <span className="text-xs font-medium text-center px-4">Selecciona una cita de las referencias para editar sus datos.</span>
               </div>
             )}
           </div>

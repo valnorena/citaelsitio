@@ -7,47 +7,72 @@ export const formatAPA = (type, data) => {
     const siteName = data.siteName ? data.siteName.trim() : '';
     const url = data.url ? data.url.trim() : '';
 
-    // LÓGICA APA 7ma Edición: Recuperado de...
     let retrievalStr = '';
-
     if (data.isDynamic) {
-        // Si la página es dinámica, generamos la fecha actual
         const today = new Date();
         const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-        // Formato exacto APA: Recuperado el [DIA] de [MES] de [AÑO], de 
         retrievalStr = ` Recuperado el ${today.getDate()} de ${months[today.getMonth()]} de ${today.getFullYear()}, de `;
     } else {
-        // Si es estática, la URL va directamente separada por un espacio
         retrievalStr = ' ';
     }
 
-    // NUEVA LÓGICA: Separamos el texto en segmentos para aplicar cursiva (Italics)
     const segments = [];
     const add = (text, italic = false) => { if (text) segments.push({ text, italic }); };
 
+    // Casos especiales que no inician con el estándar "Autor. (Año)."
+    if (type === 'chatgpt') {
+        add(`OpenAI. (${year}). `);
+        add(`ChatGPT`, true);
+        add(` [Modelo de lenguaje de gran tamaño]. ${url}`);
+        return segments;
+    }
+
+    // Inicio estándar
     add(`${author}. (${year}). `);
 
-    // Estructuras APA según tipo
     switch (type) {
-        case 'academic': // El nombre de la revista va en cursiva
+        case 'academic':
             add(`${title}. `);
             if (siteName) add(`${siteName}.`, true);
             add(`${retrievalStr}${url}`);
             break;
 
-        case 'news': // El nombre del periódico va en cursiva
+        case 'news':
             add(`${title}. `);
             if (siteName) add(`${siteName}.`, true);
             add(`${retrievalStr}${url}`);
             break;
 
-        case 'video': // El título del video va en cursiva
+        case 'video':
             add(`${title}`, true);
             add(` [Archivo de Video]. ${siteName ? siteName + '.' : 'YouTube.'}${retrievalStr}${url}`);
             break;
 
+        case 'book':
+            add(`${title}.`, true);
+            if (siteName) add(` ${siteName}.`); // Editorial
+            if (url) add(`${retrievalStr}${url}`);
+            break;
+
+        case 'social':
+            add(`${title}`, true);
+            add(` [Publicación en red social]. ${siteName ? siteName + '.' : ''}${retrievalStr}${url}`);
+            break;
+
+        case 'dictionary':
+            add(`${title}. En `);
+            add(`${siteName ? siteName : 'Diccionario en línea'}`, true);
+            add(`.${retrievalStr}${url}`);
+            break;
+
+        case 'wiki':
+            add(`${title}. En `);
+            add(`Wikipedia`, true);
+            add(`.${retrievalStr}${url}`);
+            break;
+
         case 'webpage':
-        default: // El título de la página web va en cursiva
+        default:
             add(`${title}.`, true);
             if (siteName) add(` ${siteName}.`);
             add(`${retrievalStr}${url}`);
