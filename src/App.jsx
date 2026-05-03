@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { detectSiteType } from './utils/citationLogic';
 import { formatAPA } from './utils/apaEngine';
 import { exportToPDF, exportToDocx } from './utils/exportUtils';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -450,6 +451,8 @@ function App() {
           </div>
 
         </main>
+
+        <Analytics />
       </div>
     </div>
   );
