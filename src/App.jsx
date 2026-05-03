@@ -3,6 +3,7 @@ import { detectSiteType } from './utils/citationLogic';
 import { formatAPA } from './utils/apaEngine';
 import { exportToPDF, exportToDocx } from './utils/exportUtils';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -453,6 +454,7 @@ function App() {
         </main>
 
         <Analytics />
+        <SpeedInsights />
       </div>
     </div>
   );
