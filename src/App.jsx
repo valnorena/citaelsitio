@@ -11,7 +11,6 @@ function App() {
   const [siteType, setSiteType] = useState(null);
   const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
-  // NUEVO: Añadimos isExtracted al estado inicial
   const [citationData, setCitationData] = useState({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
   const [finalCitation, setFinalCitation] = useState([]);
 
@@ -57,7 +56,6 @@ function App() {
           yearExtracted = new Date(extracted.date).getFullYear().toString();
         }
 
-        // NUEVO: Le decimos al estado que SÍ fue extraído por la API
         setCitationData({
           author: extracted.author || '',
           year: yearExtracted,
@@ -69,7 +67,6 @@ function App() {
       }
     } catch (error) {
       console.error("Error al extraer datos:", error);
-      // NUEVO: Si hay error, isExtracted es false
       setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
     } finally {
       setIsLoading(false);
@@ -106,7 +103,6 @@ function App() {
 
     setCitations([newCitation, ...citations]);
     setSiteType(null);
-    // NUEVO: Limpiamos la bandera al terminar
     setCitationData({ author: '', year: '', title: '', siteName: '', isDynamic: false, isExtracted: false });
     setUrl('');
   };
