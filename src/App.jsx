@@ -3,7 +3,7 @@ import { detectSiteType } from './utils/citationLogic';
 import { formatAPA } from './utils/apaEngine';
 import { exportToPDF, exportToDocx } from './utils/exportUtils';
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
